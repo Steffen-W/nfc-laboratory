@@ -117,6 +117,10 @@ struct Logger::Writer
 
    void push(LogEvent *event)
    {
+      // reject nre events if shutdown is started
+      if (shutdown)
+         return;
+
       if (buffered)
       {
          queue.add(event);
@@ -234,12 +238,22 @@ void Logger::print(int level, const std::string &format, std::vector<Variant> pa
 
 inline bool Logger::isEnabled(int value) const
 {
-   return writer && ((writer->level == -1 && impl->level >= value) || writer->level >= value);
+   return writer && ((writer->level < NONE_LEVEL && impl->level >= value) || writer->level >= value);
+}
+
+inline int Logger::getLevel() const
+{
+   return impl->level;
 }
 
 inline void Logger::setLevel(int level)
 {
    impl->level = level;
+}
+
+int Logger::getWriterLevel()
+{
+   return writer->level;
 }
 
 void Logger::setWriterLevel(int level)

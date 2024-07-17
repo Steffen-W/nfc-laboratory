@@ -108,7 +108,7 @@ class Subject
       {
          // append observer to list
          auto &observer = observers.emplace_back(observers.size() + 1, next, error, close);
-         log.debug("created subscription {} ({}) on subject {}", {observer.index, (void*) &observer, id});
+         log.debug("created subscription {} ({}) on subject {}", {observer.index, (void *) &observer, id});
 
          // emit retained values
          if (retained)
@@ -120,8 +120,8 @@ class Subject
          }
 
          // returns finisher to remove observer when destroyed
-         return {[this, &observer]() {
-            log.debug("removed subscription {} ({}) from subject {}", {observer.index, (void*) &observer, id});
+         return Finally {[this, &observer]() {
+            log.debug("removed subscription {} ({}) from subject {}", {observer.index, (void *) &observer, id});
             observers.remove(observer);
          }};
       }
@@ -152,7 +152,7 @@ class Subject
       // subject logger
       static Logger log;
 
-      // attach / dettach mutex
+      // attach / detach mutex
       static std::mutex mutex;
 
       // named subjects
