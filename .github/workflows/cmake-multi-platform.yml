@@ -66,9 +66,6 @@ jobs:
         # Set PATH for Qt binaries
         $env:PATH = 'C:\msys64\mingw64\bin;' + $env:PATH
 
-        echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
-
-    
     - name: Verify PATH
       if: matrix.os == 'windows-latest'
       shell: bash
@@ -79,6 +76,11 @@ jobs:
           echo "Error: /mingw64/bin not in PATH!" && exit 1;
         fi
 
+    - name: Debug workspace path
+      shell: cmd
+      run: |
+        echo "GITHUB_WORKSPACE: %GITHUB_WORKSPACE%"
+
     - name: Locate moc.exe globally
       shell: bash
       continue-on-error: true
@@ -87,15 +89,11 @@ jobs:
 
     - name: Configure CMake (Windows)
       if: matrix.os == 'windows-latest'
-      shell: bash
-      continue-on-error: true
+      shell: cmd
       run: |
         cmake -B "%GITHUB_WORKSPACE%\build" ^
               -DCMAKE_BUILD_TYPE=Release ^
-              -DCMAKE_VERBOSE_MAKEFILE=ON ^
-              -DCMAKE_AUTOMOC_VERBOSE=1 ^
               -DCMAKE_PREFIX_PATH=C:/msys64/mingw64 ^
-              -DMOC_EXECUTABLE=C:/msys64/mingw64/bin/moc.exe ^
               -S "%GITHUB_WORKSPACE%"
 
     - name: Build
