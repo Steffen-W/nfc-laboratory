@@ -75,11 +75,11 @@ jobs:
       run: |
         echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
 
-    - name: Check moc dependencies
+    - name: Locate moc.exe
       if: matrix.os == 'windows-latest'
       shell: bash
       run: |
-        ldd /mingw64/share/qt6/bin/moc.exe
+        find /mingw64 -name "moc.exe"
 
     - name: Configure CMake (Windows)
       if: matrix.os == 'windows-latest'
