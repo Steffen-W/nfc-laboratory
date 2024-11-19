@@ -41,17 +41,23 @@ jobs:
             iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'));
         }
         
-        # Install CMake, Git, and MSYS2 with Chocolatey
-        choco install cmake git msys2 -y --no-progress
+        # Install CMake and MSYS2 with Chocolatey
+        choco install cmake msys2 -y --no-progress
 
         # Update pacman databases without full system upgrade
         C:\msys64\usr\bin\bash -lc "pacman -Sy --noconfirm"
 
-        # Install necessary packages in a single command to reduce overhead
+        # Install only necessary packages
         C:\msys64\usr\bin\bash -lc "pacman -S --needed --noconfirm \
-          mingw-w64-ucrt-x86_64-gcc \
           mingw-w64-x86_64-qt6-base \
-          mingw-w64-x86_64-libusb"
+          mingw-w64-x86_64-qt6-tools \
+          mingw-w64-x86_64-gcc \
+          mingw-w64-x86_64-libusb \
+          mingw-w64-x86_64-libatomic \
+          mingw-w64-x86_64-pthreads"
+
+        # Set PATH for Qt binaries
+        set PATH=C:\msys64\mingw64\bin;%PATH%
 
     - name: Configure CMake (Linux)
       if: matrix.os == 'ubuntu-latest'
