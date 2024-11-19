@@ -34,19 +34,24 @@ jobs:
     - name: Install dependencies (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        # Install Chocolatey
-        Set-ExecutionPolicy Bypass -Scope Process -Force;
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
-        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'));
+        # Install Chocolatey if not already installed
+        if (-Not (Get-Command choco -ErrorAction SilentlyContinue)) {
+            Set-ExecutionPolicy Bypass -Scope Process -Force;
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
+            iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'));
+        }
         
-        # Install CMake, Git und MSYS2 with Chocolatey
+        # Install CMake, Git, and MSYS2 with Chocolatey
         choco install cmake git msys2 -y --no-progress
-        
-        # Update MSYS2 and install the necessary packages
-        C:\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm"
-        C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-ucrt-x86_64-gcc"
-        C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-qt6-base"
-        C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-libusb"
+
+        # Update pacman databases without full system upgrade
+        C:\msys64\usr\bin\bash -lc "pacman -Sy --noconfirm"
+
+        # Install necessary packages in a single command to reduce overhead
+        C:\msys64\usr\bin\bash -lc "pacman -S --needed --noconfirm \
+          mingw-w64-ucrt-x86_64-gcc \
+          mingw-w64-x86_64-qt6-base \
+          mingw-w64-x86_64-libusb"
 
     - name: Configure CMake (Linux)
       if: matrix.os == 'ubuntu-latest'
@@ -57,12 +62,9 @@ jobs:
 
     - name: Configure CMake (Windows)
       if: matrix.os == 'windows-latest'
+      shell: cmd
       run: |
-        cmake -B ${{ steps.strings.outputs.build-output-dir }} \
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-          -DCMAKE_PREFIX_PATH=C:/msys64/mingw64 \
-          -G "MinGW Makefiles" \
-          -S ${{ github.workspace }}
+        cmake -B "%GITHUB_WORKSPACE%\build" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:/msys64/mingw64 -S "%GITHUB_WORKSPACE%"
 
     - name: Build
       run: |
