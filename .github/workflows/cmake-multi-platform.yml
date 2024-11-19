@@ -91,10 +91,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: cmd
       run: |
-        cmake -B "%GITHUB_WORKSPACE%\build" ^
-              -DCMAKE_BUILD_TYPE=Release ^
-              -DCMAKE_PREFIX_PATH=C:/msys64/mingw64 ^
-              -S "%GITHUB_WORKSPACE%"
+        cmake -DCMAKE_BUILD_TYPE=Release -G "CodeBlocks - MinGW Makefiles" -S "%GITHUB_WORKSPACE%" -B "%GITHUB_WORKSPACE%\build" -DCMAKE_PREFIX_PATH=C:/msys64/mingw64 
 
     - name: Build
       run: |
