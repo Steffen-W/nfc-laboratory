@@ -70,11 +70,16 @@ jobs:
         echo "CMAKE_VERBOSE_MAKEFILE=ON" >> $GITHUB_ENV
         echo "CMAKE_AUTOMOC_VERBOSE=1" >> $GITHUB_ENV
 
+    - name: Add mingw64 to PATH
+      if: matrix.os == 'windows-latest'
+      run: |
+        echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
+
     - name: Check moc dependencies
       if: matrix.os == 'windows-latest'
       shell: bash
       run: |
-        ldd /mingw64/bin/moc.exe
+        ldd /mingw64/share/qt6/bin/moc.exe
 
     - name: Configure CMake (Windows)
       if: matrix.os == 'windows-latest'
