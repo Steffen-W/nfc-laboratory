@@ -49,24 +49,24 @@ jobs:
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
           -S ${{ github.workspace }}
 
-          - name: Install dependencies (Windows)
-          if: matrix.os == 'windows-latest'
-          continue-on-error: true
-          run: |
-            # Install MSYS2 and update packages
-            choco install msys2 -y --no-progress
-            C:\msys64\usr\bin\bash -lc "pacman -Sy --noconfirm"
-            C:\msys64\usr\bin\bash -lc "pacman -S --needed --noconfirm \
-              mingw-w64-x86_64-qt6-base \
-              mingw-w64-x86_64-qt6-tools \
-              mingw-w64-x86_64-qt6-declarative \
-              mingw-w64-x86_64-gcc \
-              mingw-w64-x86_64-libusb"
-            
-            # Verify PATH
-            set PATH=C:\msys64\mingw64\bin;%PATH%
-            echo "Current PATH: %PATH%"
+    - name: Install dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      continue-on-error: true
+      run: |
+        # Install MSYS2 and update packages
+        choco install msys2 -y --no-progress
+        C:\msys64\usr\bin\bash -lc "pacman -Sy --noconfirm"
+        C:\msys64\usr\bin\bash -lc "pacman -S --needed --noconfirm \
+          mingw-w64-x86_64-qt6-base \
+          mingw-w64-x86_64-qt6-tools \
+          mingw-w64-x86_64-qt6-declarative \
+          mingw-w64-x86_64-gcc \
+          mingw-w64-x86_64-libusb"
         
+        # Verify PATH
+        set PATH=C:\msys64\mingw64\bin;%PATH%
+        echo "Current PATH: %PATH%"
+    
     - name: Verify moc.exe
       if: matrix.os == 'windows-latest'
       shell: bash
